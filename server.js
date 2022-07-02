@@ -1,7 +1,8 @@
 require("dotenv").config()
 
 const abi = [
-    "function getEarningSpeed(uint tokenId) view returns(uint speed)"
+    "function getEarningSpeed(uint tokenId) view returns(uint speed)",
+    "function getTokenAttributes(uint256 _tokenId) external view returns (uint256 speed,uint256 unlocked,uint256 locked,uint256 lockedInterest,uint256 totalSpent,uint256 totalEverClaimed,uint8 pitCrew,uint8 crewChief,uint8 mechanic,uint8 gasman,uint8 tireChanger)"
 ]
 
 const {ethers} = require("ethers")
@@ -14,9 +15,26 @@ const express = require("express")
 
 const app = express()
 
-app.get("/earndata", async(req, res) => {
+app.get("/meta", async(req, res) => {
+    const tokenId = req.query.tokenId
     try {
-        res.send((await contract.getEarningSpeed(req.query.tokenId)).toString())
+        const metadata = (await (await fetch(`${process.env.API}?items=${tokenId}`)).json())[0]
+        
+        const garageData = await contract.getTokenAttributes(tokenId)
+        
+        metadata.attributes = [
+            ...metadata.attributes,
+            ...(Object.keys(garageData)).filter(key => isNaN(key)).map(key => ({
+                trait_type: key,
+                value: garageData[key].toString()
+            }))
+        ]
+        
+        console.log(metadata.attributes)
+
+        res.send(metadata)
+
+
     } catch(e) {
         console.error(e)
         res.sendStatus(500)
