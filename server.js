@@ -30,7 +30,6 @@ app.get("/meta", async(req, res) => {
             }))
         ]
         
-        console.log(metadata.attributes)
 
         res.send(metadata)
 
