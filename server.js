@@ -31,7 +31,7 @@ app.get("/meta", async(req, res) => {
         ]
         
 
-        res.send(metadata)
+        res.json(metadata)
 
 
     } catch(e) {
