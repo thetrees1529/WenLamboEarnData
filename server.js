@@ -26,7 +26,7 @@ app.get("/meta", async(req, res) => {
             ...metadata.attributes,
             ...(Object.keys(garageData)).filter(key => isNaN(key)).map(key => ({
                 trait_type: key,
-                value: garageData[key].toString()
+                value: ["lockedInterest", "totalSpent", "locked", "totalEverClaimed", "unlocked"].includes(key) ? (BigInt(garageData[key]) / BigInt(1e18)).toString() : garageData[key].toString()
             }))
         ]
         
